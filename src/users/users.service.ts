@@ -11,10 +11,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const saltOrRounds = 10;
-    const hashPassword = await bcrypt.hash(
-      createUserDto.password,
-      saltOrRounds,
-    );
+    const hashPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);
     return await this.databaseService.user.create({
       data: { ...createUserDto, password: hashPassword },
     });
