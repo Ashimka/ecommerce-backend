@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { hashSync, genSaltSync } from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -7,30 +7,29 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly databaseService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const saltOrRounds = 10;
-    const hashPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);
-    return await this.databaseService.user.create({
-      data: { ...createUserDto, password: hashPassword },
+    const hashedPassword = this.hashPassword(createUserDto.password);
+    return await this.prismaService.user.create({
+      data: { ...createUserDto, password: hashedPassword, roles: 'USER' },
     });
   }
 
   async findAll() {
-    return this.databaseService.user.findMany({});
+    return this.prismaService.user.findMany({});
   }
 
-  async findOne(id: number) {
-    return this.databaseService.user.findUnique({
+  async findOne(idOrEailOrPhome: string) {
+    return this.prismaService.user.findFirst({
       where: {
-        id,
+        OR: [{ id: idOrEailOrPhome }, { email: idOrEailOrPhome }, { phone: idOrEailOrPhome }],
       },
     });
   }
 
-  async update(id: number, updateUserDto: Prisma.UserUpdateInput) {
-    return this.databaseService.user.update({
+  async update(id: string, updateUserDto: Prisma.UserUpdateInput) {
+    return this.prismaService.user.update({
       where: {
         id,
       },
@@ -38,11 +37,15 @@ export class UsersService {
     });
   }
 
-  async remove(id: number) {
-    return this.databaseService.user.delete({
+  async remove(id: string) {
+    return this.prismaService.user.delete({
       where: {
         id,
       },
     });
+  }
+
+  private hashPassword(password: string) {
+    return hashSync(password, genSaltSync(10));
   }
 }
