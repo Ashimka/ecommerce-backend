@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 
 import { UsersModule } from './users/users.module';
-import { DatabaseModule } from './database/database.module';
+import { DatabaseModule } from './prisma/prisma.module';
 
 @Module({
   imports: [

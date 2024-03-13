@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
-import { DatabaseService } from 'src/database/database.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
     const saltOrRounds = 10;
