@@ -2,17 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { hashSync, genSaltSync } from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const hashedPassword = this.hashPassword(createUserDto.password);
+  async create(user: Partial<User>) {
+    const hashedPassword = this.hashPassword(user.password);
     return await this.prismaService.user.create({
-      data: { ...createUserDto, password: hashedPassword, roles: 'USER' },
+      data: { email: user.email, phone: user.phone, password: hashedPassword, roles: 'USER' },
     });
   }
 
@@ -21,7 +21,7 @@ export class UsersService {
   }
 
   async findOne(idOrEailOrPhome: string) {
-    return this.prismaService.user.findFirst({
+    return await this.prismaService.user.findFirst({
       where: {
         OR: [{ id: idOrEailOrPhome }, { email: idOrEailOrPhome }, { phone: idOrEailOrPhome }],
       },
