@@ -1,5 +1,6 @@
 import { Cookie } from '@common/decorators/cookies.decorator';
 import { UserAgent } from '@common/decorators/user-agent.decorator';
+import { Public } from '@common/decorators/public.decorator';
 import {
   BadRequestException,
   Body,
@@ -7,13 +8,11 @@ import {
   Get,
   HttpStatus,
   Post,
-  Req,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { log } from 'console';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -21,6 +20,7 @@ import { Tokens } from './interfaces';
 
 const REFRESH_TOKEN = 'rf_token';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(
