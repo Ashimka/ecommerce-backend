@@ -17,7 +17,15 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.prismaService.user.findMany({});
+    return this.prismaService.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        profile: true,
+        roles: true,
+      },
+    });
   }
 
   async findOne(idOrEailOrPhome: string) {
@@ -41,6 +49,9 @@ export class UsersService {
     return this.prismaService.user.delete({
       where: {
         id,
+      },
+      select: {
+        id: true,
       },
     });
   }

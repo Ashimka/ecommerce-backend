@@ -1,36 +1,54 @@
 import { Prisma } from '@prisma/client';
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, ParseUUIDPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ValidationPipe,
+  ParseUUIDPipe,
+  UseInterceptors,
+} from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponse } from './responses';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    const user = await this.usersService.create(createUserDto);
+    return new UserResponse(user);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':idOrEmailOrPhone')
-  findOne(@Param('idOrEmailOrPhone') idOrEmailOrPhone: string) {
-    return this.usersService.findOne(idOrEmailOrPhone);
+  async findOne(@Param('idOrEmailOrPhone') idOrEmailOrPhone: string) {
+    const user = await this.usersService.findOne(idOrEmailOrPhone);
+    return new UserResponse(user);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
-    return this.usersService.update(id, updateUserDto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+    const user = await this.usersService.update(id, updateUserDto);
+    return new UserResponse(user);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.usersService.remove(id);
   }
 }
