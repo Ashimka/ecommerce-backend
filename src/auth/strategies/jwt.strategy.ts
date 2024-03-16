@@ -27,10 +27,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       if (!user) {
         throw new UnauthorizedException();
       }
-      return null;
+      return payload;
     } catch (error) {
       this.logger.error(error);
+      return null;
     }
-    return payload;
   }
 }
