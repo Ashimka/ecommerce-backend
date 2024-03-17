@@ -84,4 +84,16 @@ export class AuthController {
 
     res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
   }
+
+  @Get('logout')
+  async logout(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
+    if (!refreshToken) {
+      return res.sendStatus(HttpStatus.OK);
+    }
+
+    await this.authService.deleteRefreshToken(refreshToken);
+
+    res.cookie(REFRESH_TOKEN, '', { httpOnly: true, secure: true, expires: new Date() });
+    res.sendStatus(HttpStatus.OK);
+  }
 }
