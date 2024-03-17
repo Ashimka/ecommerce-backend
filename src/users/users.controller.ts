@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import {
   ClassSerializerInterceptor,
   Controller,
@@ -11,18 +11,22 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserResponse } from './responses';
-import { CurrentUser } from '@common/decorators';
+import { CurrentUser, Roles } from '@common/decorators';
 import { JwtPayload } from '@auth/interfaces';
+import { RolesGuard } from '@auth/guards/role.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
   async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
