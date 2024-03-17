@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, Logger } from '@nestjs/common';
 import { hashSync, genSaltSync } from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,12 +7,14 @@ import { JwtPayload } from '@auth/interfaces';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(user: Partial<User>) {
     const hashedPassword = this.hashPassword(user.password);
+
     return await this.prismaService.user.create({
-      data: { email: user.email, phone: user.phone, password: hashedPassword, roles: 'USER' },
+      data: { email: user.email, phone: user.phone, password: hashedPassword },
     });
   }
 

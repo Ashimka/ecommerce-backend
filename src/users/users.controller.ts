@@ -31,6 +31,7 @@ export class UsersController {
   @Post('register')
   async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
+
     return new UserResponse(user);
   }
 

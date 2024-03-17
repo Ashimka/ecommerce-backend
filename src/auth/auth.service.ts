@@ -9,7 +9,6 @@ import { PrismaService } from '@prisma/prisma.service';
 import { v4 } from 'uuid';
 import { Token, User } from '@prisma/client';
 import { add } from 'date-fns';
-import { log } from 'console';
 
 @Injectable()
 export class AuthService {
