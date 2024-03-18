@@ -41,7 +41,7 @@ export class AuthService {
 
   async login(dto: LoginDto, agent: string): Promise<Tokens> {
     try {
-      const foundUser = await this.userService.findOne(dto.phone);
+      const foundUser = await this.userService.findOne(dto.phone, true);
 
       if (!foundUser || compareSync(dto.password, foundUser.email)) {
         throw new UnauthorizedException('Неверный логин или пароль!');
@@ -87,6 +87,7 @@ export class AuthService {
       this.jwtService.sign({
         id: user.id,
         email: user.email,
+        phone: user.phone,
         roles: user.roles,
       });
 
