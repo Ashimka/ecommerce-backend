@@ -9,8 +9,8 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    PrismaModule,
     UsersModule,
+    PrismaModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',

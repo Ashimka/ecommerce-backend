@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -11,6 +12,6 @@ import { STRATEGIES } from './strategies';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, ...STRATEGIES, ...GUARDS],
-  imports: [UsersModule, PassportModule, JwtModule.registerAsync(options())],
+  imports: [PassportModule, JwtModule.registerAsync(options()), UsersModule, HttpModule],
 })
 export class AuthModule {}

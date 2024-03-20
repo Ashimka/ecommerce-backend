@@ -1,6 +1,5 @@
-import { Cookie } from '@common/decorators/cookies.decorator';
-import { UserAgent } from '@common/decorators/user-agent.decorator';
-import { Public } from '@common/decorators/public.decorator';
+import { Cookie, Public, UserAgent } from '@common/decorators';
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Body,
@@ -9,17 +8,24 @@ import {
   Get,
   HttpStatus,
   Post,
+  Query,
+  Req,
   Res,
   UnauthorizedException,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Tokens } from './interfaces';
 import { UserResponse } from '@user/responses';
+import { YandexGuard } from './guards/yandex.guard';
+import { map, mergeMap } from 'rxjs';
+import { Provider } from '@prisma/client';
+import { handleTimeoutAndErrors } from '@common/helpers';
 
 const REFRESH_TOKEN = 'rf_token';
 
@@ -29,6 +35,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -95,5 +102,25 @@ export class AuthController {
 
     res.cookie(REFRESH_TOKEN, '', { httpOnly: true, secure: true, expires: new Date() });
     res.sendStatus(HttpStatus.OK);
+  }
+
+  @UseGuards(YandexGuard)
+  @Get('yandex')
+  yandexAuth() {}
+
+  @UseGuards(YandexGuard)
+  @Get('yandex/callback')
+  yandexAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const token = req.user['accessToken'];
+    return res.redirect(`http://localhost:8010/api/v1/auth/success-yandex?token=${token}`);
+  }
+
+  @Get('success-yandex')
+  successYandex(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
+    return this.httpService.get(`https://login.yandex.ru/info?format=json&oauth_token=${token}`).pipe(
+      mergeMap(({ data: { default_email } }) => this.authService.providerAuth(default_email, agent, Provider.YANDEX)),
+      map((data) => this.setRefreshTokenToCookies(data, res)),
+      handleTimeoutAndErrors(),
+    );
   }
 }

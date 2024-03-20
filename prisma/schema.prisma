@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  phone     String   @unique
+  id        String    @id @default(uuid())
+  email     String    @unique
+  phone     String    @unique
   password  String
-  roles     Role     @default(USER)
+  roles     Role      @default(USER)
   profile   Profile?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  provider  Provider?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
   token     Token[]
 
   @@map("users")
@@ -34,15 +35,18 @@ enum Role {
   DELIVERYMAN
 }
 
+enum Provider {
+  YANDEX
+}
+
 model Token {
-  token  String   @unique
-  exp    DateTime
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  userAgent String @map("user_agent")
+  token     String   @unique
+  exp       DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  userAgent String   @map("user_agent")
 
   @@map("tokens")
-
 }
 
 model Profile {
@@ -53,5 +57,4 @@ model Profile {
   userId    String @unique
 
   @@map("profiles")
-
 }

@@ -1,4 +1,11 @@
-import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '@user/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -7,7 +14,7 @@ import { Tokens } from './interfaces';
 import { compareSync } from 'bcrypt';
 import { PrismaService } from '@prisma/prisma.service';
 import { v4 } from 'uuid';
-import { Token, User } from '@prisma/client';
+import { Provider, Token, User } from '@prisma/client';
 import { add } from 'date-fns';
 
 @Injectable()
@@ -120,5 +127,28 @@ export class AuthService {
         token,
       },
     });
+  }
+
+  async providerAuth(email: string, agent: string, provider: Provider) {
+    try {
+      const userExists = await this.userService.findOne(email);
+
+      if (userExists) {
+        const user = await this.userService.create({ email, provider });
+
+        return this.generateTokens(user, agent);
+      }
+
+      const user = await this.userService.create({ email, provider });
+
+      if (!user) {
+        throw new HttpException(`Не получилось создать пользователя с email ${email}`, HttpStatus.BAD_REQUEST);
+      }
+
+      return this.generateTokens(user, agent);
+    } catch (error) {
+      this.logger.error(error);
+      return null;
+    }
   }
 }

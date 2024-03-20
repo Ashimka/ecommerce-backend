@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, Logger, Inject } from '@nestjs/common';
+import { Injectable, ForbiddenException, Inject } from '@nestjs/common';
 import { hashSync, genSaltSync } from 'bcrypt';
 
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,7 +11,6 @@ import { convertToSecondsUtil } from '@common/utils';
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger(UsersService.name);
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
@@ -21,9 +20,27 @@ export class UsersService {
   async create(user: Partial<User>) {
     const hashedPassword = this.hashPassword(user.password);
 
-    return await this.prismaService.user.create({
-      data: { email: user.email, phone: user.phone, password: hashedPassword },
+    const newUser = await this.prismaService.user.upsert({
+      where: {
+        email: user.email,
+      },
+      update: {
+        phone: user?.phone,
+        password: hashedPassword,
+        provider: user?.provider,
+        roles: user?.roles,
+      },
+      create: {
+        email: user.email,
+        phone: user.phone,
+        password: hashedPassword,
+        provider: user.provider,
+      },
     });
+
+    await this.cacheManager.set(newUser.email, newUser);
+
+    return newUser;
   }
 
   async findAll() {
@@ -38,7 +55,7 @@ export class UsersService {
     });
   }
 
-  async findOne(idOrEailOrPhome: string, isReset = false) {
+  async findOne(idOrEailOrPhome: string, isReset = false): Promise<User> {
     if (isReset) {
       await this.cacheManager.del(idOrEailOrPhome);
     }
