@@ -1,5 +1,6 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import {
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Post,
@@ -7,43 +8,54 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   ValidationPipe,
+  ParseUUIDPipe,
+  UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponse } from './responses';
+import { CurrentUser, Roles } from '@common/decorators';
+import { JwtPayload } from '@auth/interfaces';
+import { RolesGuard } from '@auth/guards/role.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('register')
+  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    const user = await this.usersService.create(createUserDto);
+
+    return new UserResponse(user);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':idOrEmailOrPhone')
+  async findOne(@Param('idOrEmailOrPhone') idOrEmailOrPhone: string) {
+    const user = await this.usersService.findOne(idOrEmailOrPhone);
+    return new UserResponse(user);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: Prisma.UserUpdateInput,
-  ) {
-    return this.usersService.update(id, updateUserDto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+    const user = await this.usersService.update(id, updateUserDto);
+    return new UserResponse(user);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: JwtPayload) {
+    return await this.usersService.remove(id, user);
   }
 }

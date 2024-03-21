@@ -16,6 +16,16 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@prisma": ["src/prisma"],
+      "@prisma/*": ["src/prisma/*"],
+      "@user": ["src/users"],
+      "@user/*": ["src/users/*"],
+      "@common": ["libs/common/src"],
+      "@common/*": ["libs/common/src/*"],
+      "@auth": ["src/auth"],
+      "@auth/*": ["src/auth/*"]
+    }
   }
 }
