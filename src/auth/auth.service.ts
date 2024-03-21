@@ -129,17 +129,17 @@ export class AuthService {
     });
   }
 
-  async providerAuth(email: string, agent: string, provider: Provider) {
+  async providerAuth(email: string, phone: { number: number }, agent: string, provider: Provider) {
     try {
+      const foundPhone = phone?.number;
+
       const userExists = await this.userService.findOne(email);
 
       if (userExists) {
-        const user = await this.userService.create({ email, provider });
-
-        return this.generateTokens(user, agent);
+        return this.generateTokens(userExists, agent);
       }
 
-      const user = await this.userService.create({ email, provider });
+      const user = await this.userService.create({ email, phone: foundPhone.toString(), provider });
 
       if (!user) {
         throw new HttpException(`Не получилось создать пользователя с email ${email}`, HttpStatus.BAD_REQUEST);

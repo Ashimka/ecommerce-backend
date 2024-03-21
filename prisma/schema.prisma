@@ -17,7 +17,7 @@ model User {
   id        String    @id @default(uuid())
   email     String    @unique
   phone     String    @unique
-  password  String
+  password  String?
   roles     Role      @default(USER)
   profile   Profile?
   provider  Provider?

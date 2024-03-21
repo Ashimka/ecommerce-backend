@@ -7,8 +7,8 @@ import { Strategy } from 'passport-yandex';
 export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
   constructor(private readonly configService: ConfigService) {
     super({
-      clientID: configService.get('YANDEX_APP_ID', process.env.YANDEX_APP_ID), // Замените на свой APP_ID
-      clientSecret: configService.get('YANDEX_APP_SECRET', process.env.YANDEX_APP_SECRET), // Замените на свой APP_SECRET
+      clientID: configService.get<string>('YANDEX_APP_ID', process.env.YANDEX_APP_ID),
+      clientSecret: configService.get<string>('YANDEX_APP_SECRET', process.env.YANDEX_APP_SECRET),
       callbackURL: 'http://localhost:8010/api/v1/auth/yandex/callback', // Замените на свой callback URL
     });
   }
@@ -16,7 +16,7 @@ export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile,
+    profile: any,
     done: (err: any, user: any, info?: any) => void,
   ): Promise<any> {
     const { id, displayName, emails, photos } = profile;

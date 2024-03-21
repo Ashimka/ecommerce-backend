@@ -118,7 +118,9 @@ export class AuthController {
   @Get('success-yandex')
   successYandex(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
     return this.httpService.get(`https://login.yandex.ru/info?format=json&oauth_token=${token}`).pipe(
-      mergeMap(({ data: { default_email } }) => this.authService.providerAuth(default_email, agent, Provider.YANDEX)),
+      mergeMap(({ data: { default_email, default_phone } }) =>
+        this.authService.providerAuth(default_email, default_phone, agent, Provider.YANDEX),
+      ),
       map((data) => this.setRefreshTokenToCookies(data, res)),
       handleTimeoutAndErrors(),
     );

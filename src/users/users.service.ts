@@ -18,8 +18,7 @@ export class UsersService {
   ) {}
 
   async create(user: Partial<User>) {
-    const hashedPassword = this.hashPassword(user.password);
-
+    const hashedPassword = user?.password ? this.hashPassword(user.password) : null;
     const newUser = await this.prismaService.user.upsert({
       where: {
         email: user.email,
