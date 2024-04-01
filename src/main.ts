@@ -11,6 +11,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('api/v1');
+  app.enableCors({
+    credentials: true,
+    origin: ['http://localhost:5173'],
+  });
 
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
