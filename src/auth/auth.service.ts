@@ -50,7 +50,7 @@ export class AuthService {
     try {
       const foundUser = await this.userService.findOne(dto.phone, true);
 
-      if (!foundUser || compareSync(dto.password, foundUser.email)) {
+      if (!foundUser || !compareSync(dto.password, foundUser.password)) {
         throw new UnauthorizedException('Неверный логин или пароль!');
       }
 

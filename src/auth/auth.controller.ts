@@ -55,7 +55,7 @@ export class AuthController {
     const tokens = await this.authService.login(dto, agent);
 
     if (!tokens) {
-      throw new BadRequestException(`Авторизация не удалась!`);
+      throw new BadRequestException(`Неверный логин или пароль!`);
     }
 
     this.setRefreshTokenToCookies(tokens, res);
