@@ -28,6 +28,7 @@ import { Provider } from '@prisma/client';
 import { handleTimeoutAndErrors } from '@common/helpers';
 
 const REFRESH_TOKEN = 'rf_token';
+const ACCESS_TOKEN = 'AC_Token';
 
 @Public()
 @Controller('auth')
@@ -44,7 +45,7 @@ export class AuthController {
     const user = await this.authService.register(dto);
 
     if (!user) {
-      throw new BadRequestException(`Не удалось зарегистрировать с данными ${JSON.stringify(dto)}`);
+      throw new BadRequestException(`Не удалось зарегистрировать`);
     }
 
     return new UserResponse(user);
@@ -55,7 +56,7 @@ export class AuthController {
     const tokens = await this.authService.login(dto, agent);
 
     if (!tokens) {
-      throw new BadRequestException(`Неверный логин или пароль!`);
+      throw new UnauthorizedException(`Неверный логин или пароль!`);
     }
 
     this.setRefreshTokenToCookies(tokens, res);
@@ -85,6 +86,14 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'lax',
       expires: new Date(tokens.refreshToken.exp),
+      secure: this.configService.get('NODE_ENV', process.env.NODE_ENV) === 'production',
+      path: '/',
+    });
+
+    res.cookie(ACCESS_TOKEN, tokens.accessToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 20 * 60 * 1000,
       secure: this.configService.get('NODE_ENV', process.env.NODE_ENV) === 'production',
       path: '/',
     });

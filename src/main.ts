@@ -13,7 +13,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
   });
 
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
