@@ -96,7 +96,7 @@ export class AuthService {
         phone: user.phone,
         roles: user.roles,
       },
-      { expiresIn: '1m' },
+      { expiresIn: '5m' },
     );
 
     const refreshToken = await this.getRefreshToken(user.id, agent);

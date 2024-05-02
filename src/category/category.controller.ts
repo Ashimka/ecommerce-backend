@@ -19,18 +19,18 @@ import { Roles } from '@common/decorators';
 import { Role } from '@prisma/client';
 
 @Controller('admins/category')
+@UseGuards(RolesGuard)
+@Roles(Role.ADMIN)
+@UseInterceptors(ClassSerializerInterceptor)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post('/')
   create(@Body(ValidationPipe) createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Get()
+  @Get('/')
   findAll() {
     return this.categoryService.findAll();
   }
