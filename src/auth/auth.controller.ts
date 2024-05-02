@@ -27,8 +27,8 @@ import { map, mergeMap } from 'rxjs';
 import { Provider } from '@prisma/client';
 import { handleTimeoutAndErrors } from '@common/helpers';
 
-const REFRESH_TOKEN = 'rf_token';
-const ACCESS_TOKEN = 'AC_Token';
+const REFRESH_TOKEN = 'RF_T';
+const ACCESS_TOKEN = 'AC_T';
 
 @Public()
 @Controller('auth')
@@ -93,15 +93,15 @@ export class AuthController {
     res.cookie(ACCESS_TOKEN, tokens.accessToken, {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 20 * 60 * 1000,
+      maxAge: 60 * 1000,
       secure: this.configService.get('NODE_ENV', process.env.NODE_ENV) === 'production',
       path: '/',
     });
 
-    res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
+    res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken, userLogin: tokens.userLogin });
   }
 
-  @Get('logout')
+  @Post('logout')
   async logout(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
     if (!refreshToken) {
       return res.sendStatus(HttpStatus.OK);
@@ -110,6 +110,7 @@ export class AuthController {
     await this.authService.deleteRefreshToken(refreshToken);
 
     res.cookie(REFRESH_TOKEN, '', { httpOnly: true, secure: true, expires: new Date() });
+    res.cookie(ACCESS_TOKEN, '', { httpOnly: true, secure: true, expires: new Date() });
     res.sendStatus(HttpStatus.OK);
   }
 
