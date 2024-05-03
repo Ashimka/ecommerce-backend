@@ -8,6 +8,10 @@ export class CategoryService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(category: CreateCategoryDto) {
+    const cat = await this.findOne(category.name);
+    if (cat) {
+      throw new HttpException('Категория уже существует', HttpStatus.CONFLICT);
+    }
     const newCategory = await this.prismaService.category.create({
       data: {
         name: category.name,
@@ -25,27 +29,46 @@ export class CategoryService {
     });
   }
 
-  async findOne(id: number) {
-    const cat = await this.prismaService.category.findUnique({
-      where: {
-        id,
-      },
-    });
+  async findOne(idOrName: string) {
+    let cat: CreateCategoryDto | undefined;
+    if (typeof idOrName === 'number') {
+      cat = await this.prismaService.category.findUnique({
+        where: {
+          id: idOrName,
+        },
+      });
+    }
+    if (typeof idOrName === 'string') {
+      cat = await this.prismaService.category.findUnique({
+        where: {
+          name: idOrName,
+        },
+      });
+    }
+
+    if (!cat) {
+      throw new HttpException('Не найдено', HttpStatus.NOT_FOUND);
+    }
     return cat;
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+    return this.prismaService.category.update({
+      where: {
+        id,
+      },
+      data: updateCategoryDto,
+    });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const cat = await this.findOne(id);
     if (!cat) {
       throw new HttpException('Не найдено', HttpStatus.NOT_FOUND);
     }
     return await this.prismaService.category.delete({
       where: {
-        id,
+        id: +id,
       },
     });
   }
