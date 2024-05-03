@@ -34,7 +34,7 @@ export class CategoryService {
     if (typeof idOrName === 'number') {
       cat = await this.prismaService.category.findUnique({
         where: {
-          id: idOrName,
+          id: +idOrName,
         },
       });
     }
@@ -52,12 +52,12 @@ export class CategoryService {
     return cat;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return this.prismaService.category.update({
+  async update(cat: string, updateCategoryDto: UpdateCategoryDto) {
+    return await this.prismaService.category.update({
       where: {
-        id,
+        name: cat,
       },
-      data: updateCategoryDto,
+      data: { name: updateCategoryDto.name },
     });
   }
 
