@@ -45,10 +45,6 @@ export class CategoryService {
         },
       });
     }
-
-    if (!cat) {
-      throw new HttpException('Не найдено', HttpStatus.NOT_FOUND);
-    }
     return cat;
   }
 

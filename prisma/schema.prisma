@@ -60,6 +60,21 @@ model Profile {
 }
 
 model Category {
-  id Int @id @default(autoincrement())
-  name String @unique
+  id      Int       @id @default(autoincrement())
+  name    String    @unique
+  Product Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String    @db.VarChar(1000)
+  price       Int
+  image       String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+
+  @@map("products")
 }
