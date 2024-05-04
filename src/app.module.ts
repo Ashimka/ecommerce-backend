@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { CategoryModule } from './category/category.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CategoryModule } from './category/category.module';
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     CategoryModule,
+    ProductsModule,
   ],
   providers: [
     {
