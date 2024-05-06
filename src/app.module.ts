@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { CategoryModule } from './category/category.module';
 import { ProductsModule } from './products/products.module';
+import { FileuploadModule } from './fileupload/fileupload.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ProductsModule } from './products/products.module';
     ConfigModule.forRoot({ isGlobal: true }),
     CategoryModule,
     ProductsModule,
+    FileuploadModule,
   ],
   providers: [
     {
