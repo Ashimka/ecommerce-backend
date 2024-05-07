@@ -10,4 +10,6 @@ export class CreateProductDto implements Product {
 
   @IsNotEmpty({ message: 'Заполните поле ЦЕНА' })
   price: number;
+
+  image?: string;
 }

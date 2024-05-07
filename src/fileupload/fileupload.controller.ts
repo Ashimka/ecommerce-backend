@@ -6,21 +6,22 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Delete,
+  Body,
 } from '@nestjs/common';
-import { FileuploadService } from './fileupload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName } from './utils/file-upload.utils';
+import { unlink } from 'fs/promises';
+import { resolve } from 'path';
 
 @Controller('upload')
 export class FileuploadController {
-  constructor(private readonly fileuploadService: FileuploadService) {}
-
   @Post('/')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './assets',
+        destination: './static',
         filename: editFileName,
       }),
     }),
@@ -36,11 +37,12 @@ export class FileuploadController {
     )
     file: Express.Multer.File,
   ) {
-    console.log(file);
-    const response = {
-      originalname: file.originalname,
-      filename: file.filename,
-    };
-    return response;
+    return { name: file.filename };
+  }
+
+  @Delete('/')
+  async deleteImage(@Body() name: { filename: string }) {
+    await unlink(resolve(`${__dirname}/../static`, name.filename));
+    return { message: 'File deleted' };
   }
 }

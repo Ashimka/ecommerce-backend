@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -9,9 +10,13 @@ import { APP_GUARD } from '@nestjs/core';
 import { CategoryModule } from './category/category.module';
 import { ProductsModule } from './products/products.module';
 import { FileuploadModule } from './fileupload/fileupload.module';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+    }),
     UsersModule,
     PrismaModule,
     ThrottlerModule.forRoot([
