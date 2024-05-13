@@ -12,4 +12,6 @@ export class CreateProductDto implements Product {
   price: number;
 
   image?: string;
+
+  categoryId?: number;
 }

@@ -14,8 +14,9 @@ export class ProductsService {
         data: {
           name: createProductDto.name,
           description: createProductDto.description,
-          price: createProductDto.price,
+          price: +createProductDto.price,
           image: createProductDto.image,
+          categoryId: +createProductDto.categoryId,
         },
       });
     }
@@ -23,7 +24,11 @@ export class ProductsService {
   }
 
   async findAll() {
-    return await this.prismaService.product.findMany();
+    return await this.prismaService.product.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
   }
 
   async findOne(idOrName: string) {
