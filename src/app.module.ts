@@ -11,6 +11,7 @@ import { CategoryModule } from './category/category.module';
 import { ProductsModule } from './products/products.module';
 import { FileuploadModule } from './fileupload/fileupload.module';
 import { join } from 'path';
+import { MainModule } from './main/main.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { join } from 'path';
     CategoryModule,
     ProductsModule,
     FileuploadModule,
+    MainModule,
   ],
   providers: [
     {
