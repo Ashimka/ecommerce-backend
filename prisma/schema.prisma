@@ -53,6 +53,7 @@ model Profile {
   id        String @id @default(uuid())
   firstName String @map("first_name")
   lastName  String @map("last_name")
+  address   String
   user      User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String @unique
 
