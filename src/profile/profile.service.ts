@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PrismaService } from '@prisma/prisma.service';
@@ -17,16 +17,26 @@ export class ProfileService {
     });
   }
 
-  findAll() {
-    return `This action returns all profile`;
+  async findOne(id: string) {
+    return await this.prismaService.profile.findFirst({
+      where: {
+        userId: id,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
-  }
+  async update(id: string, updateProfileDto: UpdateProfileDto) {
+    const profile = await this.findOne(id);
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+    if (!profile) {
+      throw new HttpException('Не найдено', HttpStatus.NOT_FOUND);
+    }
+    return await this.prismaService.profile.update({
+      where: {
+        userId: id,
+      },
+      data: updateProfileDto,
+    });
   }
 
   remove(id: number) {
