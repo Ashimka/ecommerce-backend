@@ -19,25 +19,26 @@ import { Roles } from '@common/decorators';
 import { Role } from '@prisma/client';
 import { Request } from 'express';
 
-@Controller('profile')
+@Controller('my')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @UseInterceptors(ClassSerializerInterceptor)
-  @Post('/')
-  async create(@Body() createProfileDto: CreateProfileDto) {
-    return await this.profileService.create(createProfileDto);
+  @Post('/settings')
+  async create(@Body() createProfileDto: CreateProfileDto, @Req() req: Request) {
+    const id = req.user['id'];
+    return await this.profileService.create({ ...createProfileDto, userId: id });
   }
 
-  @Get('/')
+  @Get('/main')
   async findOne(@Req() req: Request) {
     const id = req.user['id'];
     return await this.profileService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('/settings/:id')
   update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
     return this.profileService.update(id, updateProfileDto);
   }
