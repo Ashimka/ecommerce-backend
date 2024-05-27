@@ -26,7 +26,7 @@ export class ProfileController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @UseInterceptors(ClassSerializerInterceptor)
-  @Post('/settings')
+  @Post('/main')
   async create(@Body() createProfileDto: CreateProfileDto, @Req() req: Request) {
     const id = req.user['id'];
     return await this.profileService.create({ ...createProfileDto, userId: id });
@@ -38,8 +38,10 @@ export class ProfileController {
     return await this.profileService.findOne(id);
   }
 
-  @Patch('/settings/:id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
+  @Patch('/settings')
+  update(@Req() req: Request, @Body() updateProfileDto: UpdateProfileDto) {
+    const id = req.user['id'];
+
     return this.profileService.update(id, updateProfileDto);
   }
 
