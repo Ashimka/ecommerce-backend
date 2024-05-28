@@ -13,6 +13,7 @@ import { FileuploadModule } from './fileupload/fileupload.module';
 import { join } from 'path';
 import { MainModule } from './main/main.module';
 import { ProfileModule } from './profile/profile.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ProfileModule } from './profile/profile.module';
     FileuploadModule,
     MainModule,
     ProfileModule,
+    CartModule,
   ],
   providers: [
     {
