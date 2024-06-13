@@ -18,7 +18,7 @@ import { Cart, Role } from '@prisma/client';
 import { Request } from 'express';
 import { UpdateCartDto } from './dto/update-cart.dto';
 
-@Controller('cart')
+@Controller('my/cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 

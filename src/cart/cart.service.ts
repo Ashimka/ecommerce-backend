@@ -20,6 +20,18 @@ export class CartService {
       where: {
         userId,
       },
+      select: {
+        count: true,
+        userId: true,
+        product: {
+          select: {
+            name: true,
+            description: true,
+            image: true,
+            price: true,
+          },
+        },
+      },
     });
   }
 
